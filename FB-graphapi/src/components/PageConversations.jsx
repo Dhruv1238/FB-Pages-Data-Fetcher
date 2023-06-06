@@ -1,140 +1,195 @@
-// import React, { useEffect, useState} from 'react'; 
-// import axios from 'axios';
+// import React, { useEffect, useState } from 'react';
 
-// const PageConversations = () => {
-//     const [conversations, setConversations] = useState([]);
-//     useEffect(() => {
-//         const getPageConversations = async () => {
-//         try {
-//             const pageId='103388752785143';
-//             const accessToken = 'EAAJLnCP7R7IBAAnddfTfUQWA7wCBIs0fjyPpfFxHscj1VLxTGoeMi2Mr3ZBGBv27EooYX7BZBoQBicPdZCWdQItNiSfkVzdGRjpT0K61ORBBMsOHWPLZBQCUq8vznF27myZBHYAdUsZAzH8lZAuVWBGkQB4O4LZCTJwKmDrm2LIDaZCBXWyRnT7m5NV3fwNkSMdEQJrkZBq0mtlpiAIcbzGqVb';
-//             const response = await axios.get(`https://graph.facebook.com/v17.0/${pageId}/conversations?access_token=${accessToken}`);
-//             const {data: conversationData}= response.data;
-//             const conversationWithMessageId = await Promise.all(
-//                 conversationData.map(async (conversation) => {
-//                     const messageDataUrl=`https://graph.facebook.com/v17.0/${conversation.id}?fields=messages&access_token=${accessToken}`;
-//                     const messageDataResponse = await axios.get(messageDataUrl);
-//                     // console.log(messageDataResponse);
-//                     const {data: messagesData} = messageDataResponse;
-//                     const messageIds=messagesData.messages.data
-//                     console.log(messageIds);
+// const PageConversations = ({ pageId, accessToken }) => {
+//   const [conversations, setConversations] = useState([]);
 
-//                     const messageWithMessage=await Promise.all(
-//                         messageIds.map(async (message) => {
-//                         const messageUrl=`https://graph.facebook.com/v17.0/${message.id}?fields=id,message&access_token=${accessToken}`
-//                         const messageResponse = await axios.get(messageUrl);
-//                         console.log(messageResponse);
-//                         const {data: messagemessage} = messageResponse;
-//                         console.log(messagemessage.message);
-//                         const messagefinal=messagemessage.message;
-//                         return messagefinal;
+//   useEffect(() => {
+//     const getPageConversations = () => {
+//       window.FB.api(`/${pageId}/conversations`, 'GET', { access_token: accessToken }, response => {
+//         if (response.data && response.data.length > 0) {
+//           const conversationData = response.data;
+
+//           const getPageMessages = (conversation) => {
+//             return new Promise(resolve => {
+//               window.FB.api(`/${conversation.id}`, 'GET', { fields: 'messages', access_token: accessToken }, messageResponse => {
+//                 if (messageResponse.messages && messageResponse.messages.data && messageResponse.messages.data.length > 0) {
+//                   const messageData = messageResponse.messages.data;
+
+//                   const getMessage = (message) => {
+//                     return new Promise(resolve => {
+//                       window.FB.api(`/${message.id}`, 'GET', { fields: 'from,id,message', access_token: accessToken }, messageDetails => {
+//                         if (messageDetails && messageDetails.message) {
+//                           resolve({
+//                             id: messageDetails.id,
+//                             message: messageDetails.message,
+//                             from: messageDetails.from.name,
+//                           });
+//                         } else {
+//                           resolve(null);
 //                         }
-//                     ));
+//                       });
+//                     });
+//                   };
 
-//                 })
-//             );
-//             setConversations(conversationWithMessageId);
-            
-//         } catch (error) {
-//             console.error('error fetching conversationsID')
+//                   Promise.all(messageData.map(message => getMessage(message)))
+//                     .then(messages => {
+//                       resolve({
+//                         id: conversation.id,
+//                         messages: messages.filter(message => message !== null),
+//                       });
+//                     });
+//                 } else {
+//                   resolve(null);
+//                 }
+//               });
+//             });
+//           };
+
+//           Promise.all(conversationData.map(conversation => getPageMessages(conversation)))
+//             .then(conversations => {
+//               setConversations(conversations.filter(conversation => conversation !== null));
+//             });
+//         } else {
+//           console.log('No conversations found.');
 //         }
-//         };
-//         getPageConversations();
-//     }, []);
+//       });
+//     };
 
+//     getPageConversations();
+//   }, [pageId, accessToken]);
 
+//   return (
+//     <div>
+//       <h1>Conversations</h1>
 
-
-//     return (
-//         <div>
-//             <h1>Conversations</h1>
-            
+//       <ul>
+//         {conversations.map((conversation) => (
+//           <li key={conversation.id}>
+//             <h3>{conversation.messages[0].from}</h3>
 //             <ul>
-//                 {conversations.map((conversation) => (
-//                     <li key={conversation.id}>
-//                         <ul>
-//                             {conversation.messages.map((message)=> (
-//                                 <li key={message.id} >
-//                                     {message.id}
-//                                 </li>
-//                             ))}
-//                         </ul>
-//                     </li>
-//                 ))}
+//               {conversation.messages.map((message, index) => (
+//                 <li key={index}>
+//                   {message.message}
+//                 </li>
+//               ))}
 //             </ul>
-//         </div>
-//     );
-// }
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// };
 
 // export default PageConversations;
 
+import React, { useEffect, useState } from 'react';
 
-import React, { useEffect, useState} from 'react'; 
-import axios from 'axios';
+const PageConversations = ({ pageId, accessToken }) => {
+  const [conversations, setConversations] = useState([]);
+  const [replyText, setReplyText] = useState('');
 
-const PageConversations = () => {
-    const [conversations, setConversations] = useState([]);
+  useEffect(() => {
+    const getPageConversations = () => {
+      window.FB.api(`/${pageId}/conversations`, 'GET', { access_token: accessToken }, response => {
+        if (response.data && response.data.length > 0) {
+          const conversationData = response.data;
 
-    useEffect(() => {
-        const getPageConversations = async () => {
-            try {
-                const pageId = '103388752785143';
-                const accessToken = 'EAAJLnCP7R7IBAAnddfTfUQWA7wCBIs0fjyPpfFxHscj1VLxTGoeMi2Mr3ZBGBv27EooYX7BZBoQBicPdZCWdQItNiSfkVzdGRjpT0K61ORBBMsOHWPLZBQCUq8vznF27myZBHYAdUsZAzH8lZAuVWBGkQB4O4LZCTJwKmDrm2LIDaZCBXWyRnT7m5NV3fwNkSMdEQJrkZBq0mtlpiAIcbzGqVb';
-                const response = await axios.get(`https://graph.facebook.com/v17.0/${pageId}/conversations?access_token=${accessToken}`);
-                const { data: conversationData } = response.data;
+          const getPageMessages = (conversation) => {
+            return new Promise(resolve => {
+              window.FB.api(`/${conversation.id}`, 'GET', { fields: 'messages', access_token: accessToken }, messageResponse => {
+                if (messageResponse.messages && messageResponse.messages.data && messageResponse.messages.data.length > 0) {
+                  const messageData = messageResponse.messages.data;
 
-                const conversationWithMessageId = await Promise.all(
-                    conversationData.map(async (conversation) => {
-                        const messageDataUrl = `https://graph.facebook.com/v17.0/${conversation.id}?fields=messages&access_token=${accessToken}`;
-                        const messageDataResponse = await axios.get(messageDataUrl);
-                        const { data: messagesData } = messageDataResponse;
-                        const messageIds = messagesData.messages.data;
+                  const getMessage = (message) => {
+                    return new Promise(resolve => {
+                      window.FB.api(`/${message.id}`, 'GET', { fields: 'from,id,message', access_token: accessToken }, messageDetails => {
+                        if (messageDetails && messageDetails.message) {
+                          resolve({
+                            id: messageDetails.id,
+                            message: messageDetails.message,
+                            from: messageDetails.from.name,
+                          });
+                        } else {
+                          resolve(null);
+                        }
+                      });
+                    });
+                  };
 
-                        const messageWithMessage = await Promise.all(
-                            messageIds.map(async (message) => {
-                                const messageUrl = `https://graph.facebook.com/v17.0/${message.id}?fields=id,message&access_token=${accessToken}`;
-                                const messageResponse = await axios.get(messageUrl);
-                                const { data: messagemessage } = messageResponse;
-                                const messagefinal = messagemessage.message;
-                                return messagefinal;
-                            })
-                        );
+                  Promise.all(messageData.map(message => getMessage(message)))
+                    .then(messages => {
+                      resolve({
+                        id: conversation.id,
+                        messages: messages.filter(message => message !== null),
+                      });
+                    });
+                } else {
+                  resolve(null);
+                }
+              });
+            });
+          };
 
-                        return {
-                            id: conversation.id,
-                            messages: messageWithMessage,
-                        };
-                    })
-                );
+          Promise.all(conversationData.map(conversation => getPageMessages(conversation)))
+            .then(conversations => {
+              setConversations(conversations.filter(conversation => conversation !== null));
+            });
+        } else {
+          console.log('No conversations found.');
+        }
+      });
+    };
 
-                setConversations(conversationWithMessageId);
-            } catch (error) {
-                console.error('Error fetching conversations:', error);
-            }
-        };
+    getPageConversations();
+  }, [pageId, accessToken]);
 
-        getPageConversations();
-    }, []);
+  const handleReplyChange = (e) => {
+    setReplyText(e.target.value);
+  };
 
-    return (
-        <div>
-            <h1>Conversations</h1>
+  const handleReplySubmit = (conversationId) => {
+    if (replyText) {
+      const messageData = {
+        text: replyText
+      };
+  
+      window.FB.api(`/${conversationId}/messages`, 'POST', { message: messageData, access_token: accessToken, messaging_type: 'RESPONSE' }, response => {
+        if (response && response.id) {
+          // Reply sent successfully, update the conversations
+          setReplyText('');
+          getPageConversations();
+        } else {
+          console.log(response);
+          console.log('Failed to send reply.');
+        }
+      });
+    }
+  };
+  
 
+
+  return (
+    <div>
+      <h1>Conversations</h1>
+
+      <ul>
+        {conversations.map((conversation) => (
+          <li key={conversation.id}>
+            <h3>{conversation.messages[0].from}</h3>
             <ul>
-                {conversations.map((conversation) => (
-                    <li key={conversation.id}>
-                        <ul>
-                            {conversation.messages.map((message) => (
-                                <li key={message.id}>
-                                    {message}
-                                </li>
-                            ))}
-                        </ul>
-                    </li>
-                ))}
+              {conversation.messages.map((message, index) => (
+                <li key={index}>
+                  {message.message}
+                </li>
+              ))}
             </ul>
-        </div>
-    );
+            <input type="text" value={replyText} onChange={handleReplyChange} />
+            <button onClick={() => handleReplySubmit(conversation.id)}>Reply</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default PageConversations;

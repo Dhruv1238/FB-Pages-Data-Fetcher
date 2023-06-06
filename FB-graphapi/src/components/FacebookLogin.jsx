@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import PageConversations from './PageConversations';
 
 function FacebookLoginButton() {
     const [pageAccessTokens, setPageAccessTokens] = useState([]);
     const [posts, setPosts] = useState([]);
     const [replyInputs, setReplyInputs] = useState({});
+    const [pageIds, setPageIds] = useState([]);
+    const [accessTokens, setAccessTokens] = useState([]);
 
     const handleFacebookLogin = () => {
         window.FB.login(
@@ -32,6 +35,10 @@ function FacebookLoginButton() {
                 }));
                 console.log('Page access tokens:', pageAccessTokens);
                 setPageAccessTokens(pageAccessTokens);
+                const ids = pageAccessTokens.map(page => page.id);
+                const tokens = pageAccessTokens.map(page => page.accessToken);
+                setPageIds(ids);
+                setAccessTokens(tokens);
                 fetchPostsAndComments(pageAccessTokens);
             } else {
                 console.log('No pages found for the user.');
@@ -168,6 +175,9 @@ function FacebookLoginButton() {
                     </li>
                 ))}
             </ul>
+            {pageIds.map((pageId, index) => (
+                <PageConversations key={pageId} pageId={pageId} accessToken={accessTokens[index]} />
+            ))}
         </div>
     );
 }
