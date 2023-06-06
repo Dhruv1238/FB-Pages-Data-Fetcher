@@ -1,72 +1,16 @@
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-
-// const FacebookPageData = () => {
-//     const [posts, setPosts] = useState([]);
-
-//     useEffect(() => {
-//         const getPageData = async () => {
-//             try {
-//                 // Make API request to get posts
-//                 const pageId = '104487509340767';
-//                 const accessToken = 'EAADDPfYHGY4BAJ69UUgFmw1zT8ndmEwx1D1uVUwi2Qx59vHzPhzGRmnzVBuYRPKLdPlbVNZBtm6ZCYmX6VKdPb1byaqqJIayZBjRVdpBDr34Lj4wuHlZC3yZA8trJvAoWrCBLDo24r6059b0HFfZARTF7b3OymHFvy7QeADa2FN48lhhYmZCklfiwDJBxVuFYrDmPYdIcP7R2bsDR5ZBUloZB';
-//                 let data = [];
-//                 let nextPageUrl = `https://graph.facebook.com/v14.0/${pageId}/posts?access_token=${accessToken}`;
-
-//                 while (nextPageUrl) {
-//                     const response = await axios.get(nextPageUrl);
-//                     const { data: responseData, paging } = response.data;
-//                     data = data.concat(responseData);
-//                     nextPageUrl = paging && paging.next ? paging.next : null;
-//                 }
-
-//                 setPosts(data);
-//             } catch (error) {
-//                 console.error('Error retrieving Facebook Page data:', error);
-//             }
-//         };
-
-//         getPageData();
-//     }, []);
-
-//     return (
-//         <div>
-//             <h1>Facebook Page Data</h1>
-//             {posts.length > 0 ? (
-//                 <ul>
-//                     {posts.map((post) => (
-//                         <li key={post.id}>
-//                             <h3>{post.message}</h3>
-//                             {post.comments && post.comments.data.length > 0 && (
-//                                 <ul>
-//                                     {post.comments.data.map((comment) => (
-//                                         <li key={comment.id}>{comment.message}</li>
-//                                     ))}
-//                                 </ul>
-//                             )}
-//                         </li>
-//                     ))}
-//                 </ul>
-//             ) : (
-//                 <p>Loading...</p>
-//             )}
-//         </div>
-//     );
-// };
-
-// export default FacebookPageData;
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const FacebookPageData = () => {
     const [posts, setPosts] = useState([]);
+    const [replyMessages, setReplyMessages] = useState({});
 
     useEffect(() => {
         const getPageData = async () => {
             try {
                 // Make API request to get posts
                 const pageId = '104487509340767';
-                const accessToken = 'EAADDPfYHGY4BAJ69UUgFmw1zT8ndmEwx1D1uVUwi2Qx59vHzPhzGRmnzVBuYRPKLdPlbVNZBtm6ZCYmX6VKdPb1byaqqJIayZBjRVdpBDr34Lj4wuHlZC3yZA8trJvAoWrCBLDo24r6059b0HFfZARTF7b3OymHFvy7QeADa2FN48lhhYmZCklfiwDJBxVuFYrDmPYdIcP7R2bsDR5ZBUloZB';
+                const accessToken = 'EAADDPfYHGY4BAIa7nZBZCEXvQCeRrmVVQYSlaYQI4FMw7BR39yWrroFwrpRiZCa6nZCPZCZCgWx0jRIi0ZAG4QphmOxonNjDk8DgnKKFcaqyJJ0nt7ytyoXf1kid4AGZBjnux3Hu2dbeEbNl3FdSponp8cH5JUK6ffYNp9hNKI7BKWuZBfUIh7HtpxeJMZAZBt8bRWZBYHhlahybxnFsc8fxghMx';
                 const postsUrl = `https://graph.facebook.com/v14.0/${pageId}/posts?access_token=${accessToken}`;
                 const response = await axios.get(postsUrl);
                 const { data: postsData } = response.data;
@@ -89,6 +33,43 @@ const FacebookPageData = () => {
         getPageData();
     }, []);
 
+    const replyToComment = async (postId, commentId, message) => {
+        try {
+            const accessToken = 'EAADDPfYHGY4BAIa7nZBZCEXvQCeRrmVVQYSlaYQI4FMw7BR39yWrroFwrpRiZCa6nZCPZCZCgWx0jRIi0ZAG4QphmOxonNjDk8DgnKKFcaqyJJ0nt7ytyoXf1kid4AGZBjnux3Hu2dbeEbNl3FdSponp8cH5JUK6ffYNp9hNKI7BKWuZBfUIh7HtpxeJMZAZBt8bRWZBYHhlahybxnFsc8fxghMx';
+            const replyUrl = `https://graph.facebook.com/v14.0/${commentId}/comments?access_token=${accessToken}`;
+            const replyData = {
+                message: message,
+            };
+
+            await axios.post(replyUrl, replyData);
+
+            // Refresh the comments after replying
+            setPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                    post.id === postId
+                        ? {
+                            ...post,
+                            comments: post.comments.map((comment) =>
+                                comment.id === commentId ? { ...comment, replied: true } : comment
+                            ),
+                        }
+                        : post
+                )
+            );
+
+            console.log('Reply posted successfully!');
+        } catch (error) {
+            console.error('Error replying to comment:', error);
+        }
+    };
+
+    const handleReplyChange = (commentId, value) => {
+        setReplyMessages((prevReplyMessages) => ({
+            ...prevReplyMessages,
+            [commentId]: value,
+        }));
+    };
+
     return (
         <div>
             <h1>Facebook Page Data</h1>
@@ -100,7 +81,32 @@ const FacebookPageData = () => {
                             {post.comments && post.comments.length > 0 ? (
                                 <ul>
                                     {post.comments.map((comment) => (
-                                        <li key={comment.id}>{comment.message}</li>
+                                        <li key={comment.id}>
+                                            <p>{comment.message}</p>
+                                            {!comment.replied && (
+                                                <div>
+                                                    <input
+                                                        type='text'
+                                                        placeholder='Enter reply text'
+                                                        value={replyMessages[comment.id] || ''}
+                                                        onChange={(e) =>
+                                                            handleReplyChange(comment.id, e.target.value)
+                                                        }
+                                                    />
+                                                    <button
+                                                        onClick={() =>
+                                                            replyToComment(
+                                                                post.id,
+                                                                comment.id,
+                                                                replyMessages[comment.id]
+                                                            )
+                                                        }
+                                                    >
+                                                        Reply
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </li>
                                     ))}
                                 </ul>
                             ) : (
@@ -117,5 +123,7 @@ const FacebookPageData = () => {
 };
 
 export default FacebookPageData;
+
+
 
 
