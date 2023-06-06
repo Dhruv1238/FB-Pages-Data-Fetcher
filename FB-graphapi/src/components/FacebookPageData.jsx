@@ -5,16 +5,16 @@ const FacebookPageData = () => {
     const [posts, setPosts] = useState([]);
     const [replyMessages, setReplyMessages] = useState({});
 
+    const accessToken = 'EAADDPfYHGY4BAIa7nZBZCEXvQCeRrmVVQYSlaYQI4FMw7BR39yWrroFwrpRiZCa6nZCPZCZCgWx0jRIi0ZAG4QphmOxonNjDk8DgnKKFcaqyJJ0nt7ytyoXf1kid4AGZBjnux3Hu2dbeEbNl3FdSponp8cH5JUK6ffYNp9hNKI7BKWuZBfUIh7HtpxeJMZAZBt8bRWZBYHhlahybxnFsc8fxghMx';
+    const pageId = '104487509340767';
     useEffect(() => {
         const getPageData = async () => {
             try {
                 // Make API request to get posts
-                const pageId = '104487509340767';
-                const accessToken = 'EAADDPfYHGY4BAIa7nZBZCEXvQCeRrmVVQYSlaYQI4FMw7BR39yWrroFwrpRiZCa6nZCPZCZCgWx0jRIi0ZAG4QphmOxonNjDk8DgnKKFcaqyJJ0nt7ytyoXf1kid4AGZBjnux3Hu2dbeEbNl3FdSponp8cH5JUK6ffYNp9hNKI7BKWuZBfUIh7HtpxeJMZAZBt8bRWZBYHhlahybxnFsc8fxghMx';
+                // const accessToken = 'EAADDPfYHGY4BAIa7nZBZCEXvQCeRrmVVQYSlaYQI4FMw7BR39yWrroFwrpRiZCa6nZCPZCZCgWx0jRIi0ZAG4QphmOxonNjDk8DgnKKFcaqyJJ0nt7ytyoXf1kid4AGZBjnux3Hu2dbeEbNl3FdSponp8cH5JUK6ffYNp9hNKI7BKWuZBfUIh7HtpxeJMZAZBt8bRWZBYHhlahybxnFsc8fxghMx';
                 const postsUrl = `https://graph.facebook.com/v14.0/${pageId}/posts?access_token=${accessToken}`;
                 const response = await axios.get(postsUrl);
                 const { data: postsData } = response.data;
-
                 const postsWithComments = await Promise.all(
                     postsData.map(async (post) => {
                         const commentsUrl = `https://graph.facebook.com/v14.0/${post.id}/comments?access_token=${accessToken}`;
@@ -31,19 +31,18 @@ const FacebookPageData = () => {
         };
 
         getPageData();
-    }, []);
+    }, [accessToken]);
+    
 
     const replyToComment = async (postId, commentId, message) => {
         try {
-            const accessToken = 'EAADDPfYHGY4BAIa7nZBZCEXvQCeRrmVVQYSlaYQI4FMw7BR39yWrroFwrpRiZCa6nZCPZCZCgWx0jRIi0ZAG4QphmOxonNjDk8DgnKKFcaqyJJ0nt7ytyoXf1kid4AGZBjnux3Hu2dbeEbNl3FdSponp8cH5JUK6ffYNp9hNKI7BKWuZBfUIh7HtpxeJMZAZBt8bRWZBYHhlahybxnFsc8fxghMx';
+            // const accessToken = 'EAADDPfYHGY4BAIa7nZBZCEXvQCeRrmVVQYSlaYQI4FMw7BR39yWrroFwrpRiZCa6nZCPZCZCgWx0jRIi0ZAG4QphmOxonNjDk8DgnKKFcaqyJJ0nt7ytyoXf1kid4AGZBjnux3Hu2dbeEbNl3FdSponp8cH5JUK6ffYNp9hNKI7BKWuZBfUIh7HtpxeJMZAZBt8bRWZBYHhlahybxnFsc8fxghMx';
             const replyUrl = `https://graph.facebook.com/v14.0/${commentId}/comments?access_token=${accessToken}`;
             const replyData = {
                 message: message,
             };
 
             await axios.post(replyUrl, replyData);
-
-            // Refresh the comments after replying
             setPosts((prevPosts) =>
                 prevPosts.map((post) =>
                     post.id === postId
@@ -56,7 +55,6 @@ const FacebookPageData = () => {
                         : post
                 )
             );
-
             console.log('Reply posted successfully!');
         } catch (error) {
             console.error('Error replying to comment:', error);
