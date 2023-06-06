@@ -12,15 +12,13 @@ interface Comment {
 const CommentsList = () => {
   const [comments, setComments] = useState<Comment[]>([]);
 
-
-  
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await axios.get('/103388752785143/feed', {
+        const response = await axios.get('/{page-id}/feed', {
           params: {
             fields: 'comments{message,from}',
-            access_token: 'EAAJLnCP7R7IBABfDvN3IAjuouCgsXDkiMliMZAlBlZCQEsQkArFDg7q1AHYnpasbQb1s808zSTL3CHacCbXacZCcPJvtHIMDZAbwo8Fwpo26orB4ZA9ffpKlrdOoP8rnlnf5jl1Cg7SMc7ka8DimJlkHtYRf1bvisRqoICBh7izDJU6Ur6PgHvnxt3CeLsuPLNCrXnXeyH5a1THUA2pag',
+            access_token: 'YOUR_ACCESS_TOKEN',
           },
         });
 
