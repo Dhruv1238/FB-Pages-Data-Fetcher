@@ -147,13 +147,40 @@ const PageConversations = ({ pageId, accessToken }) => {
     setReplyText(e.target.value);
   };
 
-  const handleReplySubmit = (conversationId) => {
+//   const handleReplySubmit = (conversationId) => {
+//     if (replyText) {
+//       const messageData = {
+//         text: replyText
+//       };
+  
+//       window.FB.api(`/${conversationId}/messages`, 'POST', { message: messageData, access_token: accessToken, messaging_type: 'RESPONSE' }, response => {
+//         if (response && response.id) {
+//           // Reply sent successfully, update the conversations
+//           setReplyText('');
+//           getPageConversations();
+//         } else {
+//           console.log(response);
+//           console.log('Failed to send reply.');
+//         }
+//       });
+//     }
+//   };  
+
+const handleReplySubmit = (conversationId) => {
     if (replyText) {
-      const messageData = {
-        text: replyText
+      const recipientId = '6194757263947343';
+  
+      const requestData = {
+        recipient: {
+          id: recipientId
+        },
+        messaging_type: 'RESPONSE',
+        message: {
+          text: replyText
+        }
       };
   
-      window.FB.api(`/${conversationId}/messages`, 'POST', { message: messageData, access_token: accessToken, messaging_type: 'RESPONSE' }, response => {
+      window.FB.api(`/${pageId}/messages`, 'POST', { access_token: accessToken }, requestData, response => {
         if (response && response.id) {
           // Reply sent successfully, update the conversations
           setReplyText('');
@@ -165,6 +192,7 @@ const PageConversations = ({ pageId, accessToken }) => {
       });
     }
   };
+  
   
 
 
