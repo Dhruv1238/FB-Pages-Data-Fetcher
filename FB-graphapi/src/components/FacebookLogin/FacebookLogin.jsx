@@ -427,15 +427,14 @@ function FacebookLoginButton() {
       <ul className="page-list">
         {pageAccessTokens.map((page) => (
           <li key={page.id} className="page-item">
-            <h1 className="page-name">Name: {page.name}</h1>
-            <h2 className="page-posts-heading">Posts:</h2>
+            <h1 className="page-name">Page Name: {page.name}</h1>
             <ul className="post-list">
               {posts
                 .filter((post) => post.accessToken === page.accessToken)
                 .map((post) => (
                   <li key={post.id} className="post-item">
                     <div className="post-content">
-                      <div className="post-name">Post Name: {post.name}</div>
+                      <div className="post-name">Post Subject: {post.name}</div>
                       <ul className="comment-list">
                         Comments: <br />
                         {post.comments.slice(0, commentIndex).map((comment) => (
