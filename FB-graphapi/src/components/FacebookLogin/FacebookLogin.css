@@ -1,0 +1,118 @@
+.container {
+  margin: 20px;
+}
+
+.login-button {
+  padding: 10px;
+  background-color: #4267b2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.page-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.page-item {
+  margin-bottom: 40px;
+}
+
+.page-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-family: "Roboto", sans-serif;
+}
+
+.comment-message {
+  margin-bottom: 5px;
+  font-family: "Roboto", sans-serif;
+}
+
+.page-posts-heading {
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.post-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.post-item {
+  margin-bottom: 20px;
+}
+
+.post-content {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.post-name {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.comment-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.comment-item {
+  margin-bottom: 15px;
+}
+
+.reply-section {
+  display: flex;
+  align-items: center;
+}
+
+.reply-input {
+  width: 200px;
+  padding: 5px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.reply-button {
+  padding: 5px 10px;
+  background-color: #4267b2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.comment-item {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.message {
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  display: inline-block;
+  max-width: 80%;
+  font-family: "Roboto", sans-serif;
+}
+
+.sent-by-me {
+  background-color: #4267b2;
+  color: white;
+  align-self: flex-end;
+}
+
+.sent-by-other {
+  background-color: #f2f2f2;
+  color: black;
+  align-self: flex-start;
+}

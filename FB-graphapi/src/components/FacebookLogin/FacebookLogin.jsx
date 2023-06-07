@@ -182,7 +182,8 @@
 // export default FacebookLoginButton;
 
 import React, { useState, useEffect } from 'react';
-import PageConversations from './PageConversations';
+import './FacebookLogin.css'
+import PageConversations from '../PageConversations';
 
 function FacebookLoginButton() {
   const [pageAccessTokens, setPageAccessTokens] = useState([]);
@@ -251,7 +252,7 @@ function FacebookLoginButton() {
 
   const fetchComments = (posts) => {
     posts.forEach((post) => {
-      window.FB.api(`/${post.id}/comments`, 'GET', { access_token: post.accessToken }, (response) => {
+      window.FB.api(`/${post.id}/comments`, 'GET', { access_token: post.accessToken , limit:5 }, (response) => {
         if (response.data && response.data.length > 0) {
           const comments = response.data.map((comment) => ({
             id: comment.id,
@@ -328,35 +329,51 @@ function FacebookLoginButton() {
       window.FB.XFBML.parse();
     }
   }, []);
-
   return (
-    <div>
-      <button onClick={handleFacebookLogin}>Login with Facebook</button>
-      <ul>
+    <div className="container">
+      <button className="login-button" onClick={handleFacebookLogin}>
+        Login with Facebook
+      </button>
+      <ul className="page-list">
         {pageAccessTokens.map((page) => (
-          <li key={page.id}>
-            <h1>Name: {page.name}</h1>
-            <h2>Posts:</h2>
-            <ul>
+          <li key={page.id} className="page-item">
+            <h1 className="page-name">Name: {page.name}</h1>
+            <h2 className="page-posts-heading">Posts:</h2>
+            <ul className="post-list">
               {posts
                 .filter((post) => post.accessToken === page.accessToken)
                 .map((post) => (
-                  <li key={post.id}>
-                    {post.name}
-                    <ul>
-                      {post.comments.map((comment) => (
-                        <li key={comment.id}>
-                          {comment.message}
-                          <input
-                            type="text"
-                            placeholder="Reply"
-                            value={replyInputs[comment.id] || ''}
-                            onChange={(event) => handleInputChange(comment.id, event)}
-                          />
-                          <button onClick={() => handleReply(post.id, comment.id, post.accessToken)}>Reply</button>
-                        </li>
-                      ))}
-                    </ul>
+                  <li key={post.id} className="post-item">
+                    <div className="post-content">
+                      <div className="post-name">Post Name: {post.name}</div>
+                      <ul className="comment-list">
+                        Comments: <br/>
+                        {post.comments.map((comment) => (
+                          <li key={comment.id} className="comment-item">
+                            <div
+                              className={`message ${comment.sender === 'me' ? 'sent-by-me' : 'sent-by-other'}`}
+                            >
+                              {comment.message}
+                            </div>
+                            <div className="reply-section">
+                              <input
+                                type="text"
+                                className="reply-input"
+                                placeholder="Reply"
+                                value={replyInputs[comment.id] || ''}
+                                onChange={(event) => handleInputChange(comment.id, event)}
+                              />
+                              <button
+                                className="reply-button"
+                                onClick={() => handleReply(post.id, comment.id, post.accessToken)}
+                              >
+                                Reply
+                              </button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </li>
                 ))}
             </ul>

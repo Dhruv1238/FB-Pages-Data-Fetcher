@@ -147,25 +147,6 @@ const PageConversations = ({ pageId, accessToken }) => {
     setReplyText(e.target.value);
   };
 
-//   const handleReplySubmit = (conversationId) => {
-//     if (replyText) {
-//       const messageData = {
-//         text: replyText
-//       };
-  
-//       window.FB.api(`/${conversationId}/messages`, 'POST', { message: messageData, access_token: accessToken, messaging_type: 'RESPONSE' }, response => {
-//         if (response && response.id) {
-//           // Reply sent successfully, update the conversations
-//           setReplyText('');
-//           getPageConversations();
-//         } else {
-//           console.log(response);
-//           console.log('Failed to send reply.');
-//         }
-//       });
-//     }
-//   };  
-
 const handleReplySubmit = (conversationId) => {
     if (replyText) {
       const recipientId = '6194757263947343';
@@ -193,9 +174,6 @@ const handleReplySubmit = (conversationId) => {
     }
   };
   
-  
-
-
   return (
     <div>
       <ul>
@@ -220,3 +198,22 @@ const handleReplySubmit = (conversationId) => {
 };
 
 export default PageConversations;
+
+//   const handleReplySubmit = (conversationId) => {
+//     if (replyText) {
+//       const messageData = {
+//         text: replyText
+//       };
+  
+//       window.FB.api(`/${conversationId}/messages`, 'POST', { message: messageData, access_token: accessToken, messaging_type: 'RESPONSE' }, response => {
+//         if (response && response.id) {
+//           // Reply sent successfully, update the conversations
+//           setReplyText('');
+//           getPageConversations();
+//         } else {
+//           console.log(response);
+//           console.log('Failed to send reply.');
+//         }
+//       });
+//     }
+//   };  
