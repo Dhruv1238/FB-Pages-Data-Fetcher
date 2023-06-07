@@ -184,6 +184,10 @@
 import React, { useState, useEffect } from 'react';
 import './FacebookLogin.css'
 import PageConversations from '../PageConversations';
+import Loader from '../Loader/Loader';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function FacebookLoginButton() {
   const [pageAccessTokens, setPageAccessTokens] = useState([]);
@@ -191,8 +195,10 @@ function FacebookLoginButton() {
   const [replyInputs, setReplyInputs] = useState({});
   const [pageIds, setPageIds] = useState([]);
   const [accessTokens, setAccessTokens] = useState([]);
+  const [loading,setLoading] = useState(false)
 
   const handleFacebookLogin = () => {
+    setLoading(true)
     window.FB.login(
       (response) => {
         if (response.authResponse) {
@@ -201,7 +207,10 @@ function FacebookLoginButton() {
           console.log('User access token:', userAccessToken);
           console.log('User ID:', userID);
           fetchPageAccessTokens(userAccessToken, userID);
+          setLoading(false)
+          toast.success("Login Successful!!")
         } else {
+          setLoading(false)
           console.log('User cancelled login or did not fully authorize.');
         }
       },
@@ -243,8 +252,9 @@ function FacebookLoginButton() {
           console.log('Posts:', posts);
           setPosts((prevPosts) => [...prevPosts, ...posts]);
           fetchComments(posts);
+          toast.success("Posts fetched!!")
         } else {
-          console.log('No posts found for the page.');
+          toast.error('No posts found for the page.');
         }
       });
     });
@@ -267,6 +277,7 @@ function FacebookLoginButton() {
               return prevPost;
             });
           });
+          toast.success("Comments fetched!!")
         } else {
           console.log('No comments found for the post.');
         }
@@ -275,6 +286,7 @@ function FacebookLoginButton() {
   };
 
   const handleReply = (postId, commentId, accessToken) => {
+    setLoading(true)
     const replyMessage = replyInputs[commentId];
     if (replyMessage.trim() !== '') {
       window.FB.api(`/${commentId}/comments`, 'POST', { access_token: accessToken, message: replyMessage }, (response) => {
@@ -286,8 +298,11 @@ function FacebookLoginButton() {
             return newInputs;
           });
           refreshComments(postId, accessToken);
+          setLoading(false)
+          toast.success("Reply sent successfully")
         } else {
-          console.log('Error posting reply:', response.error);
+          setLoading(false)
+          toast.error(`Error posting reply:, ${response.error}`);
         }
       });
     } else {
@@ -331,6 +346,7 @@ function FacebookLoginButton() {
   }, []);
   return (
     <div className="container">
+      {loading && <Loader/>}
       <button className="login-button" onClick={handleFacebookLogin}>
         Login with Facebook
       </button>

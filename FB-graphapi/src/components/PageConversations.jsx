@@ -83,13 +83,19 @@
 // export default PageConversations;
 
 import React, { useEffect, useState } from 'react';
+import Loader from '../components/Loader/Loader'
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PageConversations = ({ pageId, accessToken }) => {
   const [conversations, setConversations] = useState([]);
   const [replyText, setReplyText] = useState('');
+  const [loading,setLoading] = useState(false);
 
   useEffect(() => {
     const getPageConversations = () => {
+      setLoading(true)
       window.FB.api(`/${pageId}/conversations`, 'GET', { access_token: accessToken }, response => {
         if (response.data && response.data.length > 0) {
           const conversationData = response.data;
@@ -134,8 +140,10 @@ const PageConversations = ({ pageId, accessToken }) => {
             .then(conversations => {
               setConversations(conversations.filter(conversation => conversation !== null));
             });
+            setLoading(false)
         } else {
-          console.log('No conversations found.');
+          setLoading(false)
+          toast.error('No conversations found.');
         }
       });
     };
@@ -148,6 +156,7 @@ const PageConversations = ({ pageId, accessToken }) => {
   };
 
 const handleReplySubmit = (conversationId) => {
+    setLoading(true)
     if (replyText) {
       const recipientId = '6194757263947343';
   
@@ -166,9 +175,11 @@ const handleReplySubmit = (conversationId) => {
           // Reply sent successfully, update the conversations
           setReplyText('');
           getPageConversations();
+          setLoading(false)
+          toast.success('Reply sent successfully!!');
         } else {
           console.log(response);
-          console.log('Failed to send reply.');
+          toast.error('Failed to send reply.');
         }
       });
     }
@@ -176,6 +187,7 @@ const handleReplySubmit = (conversationId) => {
   
   return (
     <div>
+      {loading && <Loader/>}
       <ul>
         {conversations.map((conversation) => (
           <li key={conversation.id}>
