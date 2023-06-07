@@ -141,6 +141,7 @@ const PageConversations = ({ pageId, accessToken }) => {
               setConversations(conversations.filter(conversation => conversation !== null));
             });
             setLoading(false)
+            toast.success("Conversations fetched!!")
         } else {
           setLoading(false)
           toast.error('No conversations found.');
@@ -155,35 +156,84 @@ const PageConversations = ({ pageId, accessToken }) => {
     setReplyText(e.target.value);
   };
 
+// const handleReplySubmit = (conversationId) => {
+//     setLoading(true)
+//     if (replyText) {
+//       const recipientId = '6194757263947343';
+  
+//       const requestData = {
+//         recipient: {
+//           id: recipientId
+//         },
+//         messaging_type: 'RESPONSE',
+//         message: {
+//           text: replyText
+//         }
+//       };
+  
+//       window.FB.api(`/${pageId}/messages`, 'POST', { access_token: accessToken }, requestData, response => {
+//         if (response && response.id) {
+//           // Reply sent successfully, update the conversations
+//           setReplyText('');
+//           getPageConversations();
+//           setLoading(false)
+//           toast.success('Reply sent successfully!!');
+//         } else {
+//           console.log(response);
+//           toast.error('Failed to send reply.');
+//         }
+//       });
+//     }
+//   };
 const handleReplySubmit = (conversationId) => {
-    setLoading(true)
-    if (replyText) {
-      const recipientId = '6194757263947343';
-  
-      const requestData = {
-        recipient: {
-          id: recipientId
-        },
-        messaging_type: 'RESPONSE',
-        message: {
-          text: replyText
-        }
-      };
-  
-      window.FB.api(`/${pageId}/messages`, 'POST', { access_token: accessToken }, requestData, response => {
-        if (response && response.id) {
-          // Reply sent successfully, update the conversations
-          setReplyText('');
-          getPageConversations();
-          setLoading(false)
-          toast.success('Reply sent successfully!!');
+  setLoading(true);
+  if (replyText) {
+    // Get the conversation details including participants
+    window.FB.api(`/${conversationId}`, 'GET', { fields: 'participants', access_token: accessToken }, response => {
+      if (response && response.participants && response.participants.data && response.participants.data.length > 0) {
+        const participants = response.participants.data;
+        // Find the recipient ID by excluding the current user's ID
+        const recipient = participants.find(participant => participant.id !== pageId);
+        if (recipient) {
+          const recipientId = recipient.id;
+
+          const requestData = {
+            recipient: {
+              id: recipientId
+            },
+            messaging_type: 'RESPONSE',
+            message: {
+              text: replyText
+            }
+          };
+
+          window.FB.api(`/${pageId}/messages`, 'POST', { access_token: accessToken }, requestData, response => {
+            if (response && response.id) {
+              // Reply sent successfully, update the conversations
+              setReplyText('');
+              getPageConversations();
+              setLoading(false);
+              toast.success('Reply sent successfully!!');
+            } else {
+              console.log(response);
+              setLoading(false);
+              toast.error('Failed to send reply.');
+            }
+          });
         } else {
-          console.log(response);
+          console.log('Recipient not found in conversation participants.');
+          setLoading(false);
           toast.error('Failed to send reply.');
         }
-      });
-    }
-  };
+      } else {
+        console.log('No conversation participants found.');
+        setLoading(false);
+        toast.error('Failed to send reply.');
+      }
+    });
+  }
+};
+
   
   return (
     <div>
