@@ -20,18 +20,28 @@ const PageConversations = ({ pageId, accessToken }) => {
           const getPageMessages = (conversation) => {
             return new Promise(resolve => {
               window.FB.api(`/${conversation.id}`, 'GET', { fields: 'messages', access_token: accessToken }, messageResponse => {
+                console.log("Message response")
                 if (messageResponse.messages && messageResponse.messages.data && messageResponse.messages.data.length > 0) {
                   const messageData = messageResponse.messages.data;
 
                   const getMessage = (message) => {
                     return new Promise(resolve => {
-                      window.FB.api(`/${message.id}`, 'GET', { fields: 'from,id,message', access_token: accessToken }, messageDetails => {
+                      window.FB.api(`/${message.id}`, 'GET', { fields: 'from,id,message,created_time', access_token: accessToken }, messageDetails => {
                         if (messageDetails && messageDetails.message) {
+      
                           resolve({
                             id: messageDetails.id,
                             message: messageDetails.message,
                             from: messageDetails.from.name,
+                            recipientID: messageDetails.from.id,
                           });
+                          console.log(messageDetails.message)
+                          // const messageDetailer = {
+                          //   id: messageDetails.id,
+                          //   message: messageDetails.message,
+                          //   from: messageDetails.from.name,
+                          //   fromId: messageDetails.from.id,
+                          // };
                         } else {
                           resolve(null);
                         }
@@ -56,6 +66,7 @@ const PageConversations = ({ pageId, accessToken }) => {
           Promise.all(conversationData.map(conversation => getPageMessages(conversation)))
             .then(conversations => {
               setConversations(conversations.filter(conversation => conversation !== null));
+              console.log("Last Message ", conversations[0].messages[conversations[0].messages.length - 1].recipientID)
             });
             setLoading(false)
             toast.success("Conversations fetched!!")
@@ -94,13 +105,14 @@ const PageConversations = ({ pageId, accessToken }) => {
         }
       });
     } else {
+      console.log(response.error)
       toast.error('Reply text is empty.');
     }
   };
   
 
   useEffect(() => {
-    console.log("Conversations: ", conversations);
+    console.log("Conversations: ",conversations)
   }, [conversations]);
 // return (
 //   <div className="page-conversations">
@@ -164,7 +176,7 @@ return (
               onChange={handleReplyChange}
               placeholder="Type your reply..."
             />
-            <button className="reply-button" onClick={() => handleReplySubmit(6194757263947343)}>
+            <button className="reply-button" onClick={() => handleReplySubmit(conversation.messages[conversation.messages.length-1].recipientID)}>
               Reply
             </button>
           </div>
