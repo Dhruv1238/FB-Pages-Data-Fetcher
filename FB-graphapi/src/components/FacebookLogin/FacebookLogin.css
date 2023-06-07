@@ -1,15 +1,21 @@
 .container {
-  margin: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .login-button {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto;
   padding: 10px;
-  background-color: #4267b2;
-  color: white;
+  background-color: #3b5998;
+  color: #fff;
+  font-size: 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-bottom: 20px;
 }
 
 .page-list {
@@ -18,24 +24,19 @@
 }
 
 .page-item {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .page-name {
   font-size: 20px;
   font-weight: bold;
-  margin-bottom: 10px;
-  font-family: "Roboto", sans-serif;
-}
-
-.comment-message {
-  margin-bottom: 5px;
-  font-family: "Roboto", sans-serif;
 }
 
 .page-posts-heading {
-  font-size: 16px;
   margin-top: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family:'Poppins';
 }
 
 .post-list {
@@ -45,17 +46,15 @@
 }
 
 .post-item {
-  margin-bottom: 20px;
-}
-
-.post-content {
+  margin-top: 10px;
   border: 1px solid #ccc;
   padding: 10px;
+  border-radius: 4px;
 }
 
 .post-name {
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .comment-list {
@@ -65,54 +64,60 @@
 }
 
 .comment-item {
-  margin-bottom: 15px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.message {
+  margin-bottom: 5px;
+}
+
+.sent-by-me {
+  width: 50%;
+  padding:5px;
+  background-color: #eaf2ff;
+}
+
+.sent-by-other {
+  width: 50%;
+  padding:5px;
+  background-color: #f7f7f7;
 }
 
 .reply-section {
-  display: flex;
-  align-items: center;
+  margin-top: 10px;
 }
 
 .reply-input {
-  width: 200px;
+  width: 50%;
   padding: 5px;
-  margin-right: 10px;
+  margin: 0 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 .reply-button {
+  display: inline-block;
+  margin-top: 5px;
   padding: 5px 10px;
-  background-color: #4267b2;
-  color: white;
+  background-color: #3b5998;
+  color: #fff;
+  font-size: 14px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.comment-item {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-}
-
-.message {
+.next-button {
+  display: block;
+  margin-top: 10px;
   padding: 5px 10px;
+  background-color: #3b5998;
+  color: #fff;
+  font-size: 14px;
+  border: none;
   border-radius: 4px;
-  margin-bottom: 5px;
-  display: inline-block;
-  max-width: 80%;
-  font-family: "Roboto", sans-serif;
-}
-
-.sent-by-me {
-  background-color: #4267b2;
-  color: white;
-  align-self: flex-end;
-}
-
-.sent-by-other {
-  background-color: #f2f2f2;
-  color: black;
-  align-self: flex-start;
+  cursor: pointer;
 }
