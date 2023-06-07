@@ -69,16 +69,82 @@ const PageConversations = ({ pageId, accessToken }) => {
     getPageConversations();
   }, [pageId, accessToken]);
   
+  const handleReplyChange = (event) => {
+    setReplyText(event.target.value);
+  };
 
+  const handleReplySubmit = (conversationId) => {
+    if (replyText.trim() !== '') {
+      const messageData = {
+        recipient: {
+          id: conversationId,
+        },
+        messaging_type: 'RESPONSE',
+        message: {
+          text: replyText,
+        },
+      };
+  
+      window.FB.api(`/${pageId}/messages`, 'POST', { access_token: accessToken, ...messageData }, (response) => {
+        if (response && !response.error) {
+          toast.success('Reply sent successfully!');
+          setReplyText('');
+        } else {
+          toast.error('Error sending reply.');
+        }
+      });
+    } else {
+      toast.error('Reply text is empty.');
+    }
+  };
+  
 
   useEffect(() => {
     console.log("Conversations: ", conversations);
   }, [conversations]);
+// return (
+//   <div className="page-conversations">
+//     {loading && <Loader />}
+//     <ul className="conversation-list">
+//     <h1 className="conversation-heading">Conversations</h1>
+//       {conversations.map((conversation) => (
+//         <li key={conversation.id} className="conversation-item">
+//           <h1 className="conversation-heading">Your Conversation with : </h1>
+//           <ul className="message-list">
+//             {conversation.messages.map((message, index) => (
+//               <li key={index} className="message-item">
+//                 <h3 className="conversation-participant">From:{conversation.messages[index].from}</h3>
+//                 {message.message}
+//               </li>
+//             ))}
+//           </ul>
+//           <div className="reply-section">
+//             <input
+//               type="text"
+//               className="reply-input"
+//               // value={replyText}
+//               // onChange={handleReplyChange}
+//               placeholder="Type your reply..."
+//             />
+//             <button
+//               className="reply-button"
+//               // onClick={() => handleReplySubmit(conversation.id)}
+//             >
+//               Reply
+//             </button>
+//           </div>
+//         </li>
+//       ))}
+//     </ul>
+//   </div>
+// );
+
 return (
   <div className="page-conversations">
     {loading && <Loader />}
+    <ToastContainer />
     <ul className="conversation-list">
-    <h1 className="conversation-heading">Conversations</h1>
+      <h1 className="conversation-heading">Conversations</h1>
       {conversations.map((conversation) => (
         <li key={conversation.id} className="conversation-item">
           <h1 className="conversation-heading">Your Conversation with : </h1>
@@ -94,14 +160,11 @@ return (
             <input
               type="text"
               className="reply-input"
-              // value={replyText}
-              // onChange={handleReplyChange}
+              value={replyText}
+              onChange={handleReplyChange}
               placeholder="Type your reply..."
             />
-            <button
-              className="reply-button"
-              // onClick={() => handleReplySubmit(conversation.id)}
-            >
+            <button className="reply-button" onClick={() => handleReplySubmit(6194757263947343)}>
               Reply
             </button>
           </div>
