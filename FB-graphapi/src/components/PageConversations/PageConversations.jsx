@@ -95,12 +95,15 @@ const PageConversations = ({ pageId, accessToken }) => {
           text: replyText,
         },
       };
-  
+      setLoading(true)
       window.FB.api(`/${pageId}/messages`, 'POST', { access_token: accessToken, ...messageData }, (response) => {
         if (response && !response.error) {
+          setLoading(false)
           toast.success('Reply sent successfully!');
           setReplyText('');
+
         } else {
+          setLoading(false)
           toast.error('Error sending reply.');
         }
       });

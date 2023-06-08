@@ -321,6 +321,37 @@ function FacebookLoginButton() {
     });
   };
 
+  // const fetchComments = (posts) => {
+  //   posts.forEach((post) => {
+  //     window.FB.api(
+  //       `/${post.id}/comments`,
+  //       'GET',
+  //       { access_token: post.accessToken },
+  //       (response) => {
+  //         if (response.data && response.data.length > 0) {
+  //           const comments = response.data.map((comment) => ({
+  //             id: comment.id,
+  //             message: comment.message,
+  //             created_time: comment.created_time,
+  //             name: comment.from.name
+  //           }));
+  //           console.log('Comments:', comments);
+  //           setPosts((prevPosts) => {
+  //             return prevPosts.map((prevPost) => {
+  //               if (prevPost.id === post.id) {
+  //                 return { ...prevPost, comments: [...comments] };
+  //               }
+  //               return prevPost;
+  //             });
+  //           });
+  //           toast.success('Comments fetched!!');
+  //         } else {
+  //           console.log('No comments found for the post.');
+  //         }
+  //       }
+  //     );
+  //   });
+  // };
   const fetchComments = (posts) => {
     posts.forEach((post) => {
       window.FB.api(
@@ -332,12 +363,18 @@ function FacebookLoginButton() {
             const comments = response.data.map((comment) => ({
               id: comment.id,
               message: comment.message,
+              created_time: comment.created_time,
+              name: comment.from.name
             }));
-            console.log('Comments:', comments);
+
+            // Sort comments by created_time in descending order
+            const sortedComments = comments.sort((a, b) => new Date(b.created_time) - new Date(a.created_time));
+
+            console.log('Comments:', sortedComments);
             setPosts((prevPosts) => {
               return prevPosts.map((prevPost) => {
                 if (prevPost.id === post.id) {
-                  return { ...prevPost, comments: [...comments] };
+                  return { ...prevPost, comments: [...sortedComments] };
                 }
                 return prevPost;
               });
@@ -350,8 +387,6 @@ function FacebookLoginButton() {
       );
     });
   };
-
-
 
   const handleReply = (postId, commentId, accessToken) => {
     setLoading(true);
@@ -442,7 +477,8 @@ function FacebookLoginButton() {
                             <div
                               className={`message ${comment.sender === 'me' ? 'sent-by-me' : 'sent-by-other'}`}
                             >
-                              {comment.message}
+                              From: {comment.name} <br/>
+                              Message: {comment.message}
                             </div>
                             <div className="reply-section">
                               <input
