@@ -201,11 +201,9 @@ function FacebookLoginButton() {
                         Comments: <br />
                         {post.comments.slice(0, commentIndex).map((comment) => (
                           <li key={comment.id} className="comment-item">
-                            <div
-                              className={`message ${comment.sender === 'me' ? 'sent-by-me' : 'sent-by-other'}`}
-                            >
-                              From: {comment.name} <br/>
-                              Message: {comment.message}
+                            <div className='comment'>
+                              {comment.name} Commented: <br/>
+                              {comment.message}
                             </div>
                             <div className="reply-section">
                               <input

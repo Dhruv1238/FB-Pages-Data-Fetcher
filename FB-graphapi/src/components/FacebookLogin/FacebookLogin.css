@@ -74,16 +74,10 @@
   margin-bottom: 5px;
 }
 
-.sent-by-me {
+.comment{
   width: 50%;
   padding:5px;
-  background-color: #eaf2ff;
-}
-
-.sent-by-other {
-  width: 50%;
-  padding:5px;
-  background-color: #f7f7f7;
+  background-color: white;
 }
 
 .reply-section {
