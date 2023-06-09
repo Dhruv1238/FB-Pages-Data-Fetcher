@@ -93,3 +93,24 @@
   cursor: pointer;
 }
 
+.conversation-dropdown {
+  margin-bottom: 20px;
+}
+
+.conversation-heading {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.conversation-select {
+  width:100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+}
+

@@ -8,7 +8,7 @@
   display: block;
   width: 100%;
   max-width: 200px;
-  margin: 0 auto;
+  margin: 40px auto;
   padding: 10px;
   background-color: #3b5998;
   color: #fff;
@@ -36,7 +36,7 @@
   margin-top: 10px;
   font-size: 16px;
   font-weight: bold;
-  font-family:'Poppins';
+  font-family: "Poppins";
 }
 
 .post-list {
@@ -74,9 +74,9 @@
   margin-bottom: 5px;
 }
 
-.comment{
+.comment {
   width: 50%;
-  padding:5px;
+  padding: 5px;
   background-color: white;
 }
 
@@ -115,3 +115,23 @@
   border-radius: 4px;
   cursor: pointer;
 }
+/* FacebookLogin.css */
+
+.post-dropdown , .post-select{
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.post-dropdown .post-select option {
+  font-size: 16px;
+  color: #333;
+}
+
+/* Add additional styles as needed */
+

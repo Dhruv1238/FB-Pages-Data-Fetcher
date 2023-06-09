@@ -177,17 +177,20 @@ const PageConversations = ({ pageId, accessToken }) => {
           </div>
           {checkLength(selectedConversation) && (
             <>
-                {selectedConversation.messages.length > 5 ? (
-                  <>
-                    <button className='reply-button' onClick={handleShowMoreMessages}>
-                      Show More messages
-                    </button>
-                    <button className='reply-button' onClick={handleShowLessMessages}>
-                      Show Less messages
-                    </button>
-                  </>
-
-                ) : null}
+              {selectedConversation.messages.length > showMessages ? (
+                <>
+                  <button className='reply-button' onClick={handleShowMoreMessages}>
+                    Show More messages
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className='reply-button' onClick={handleShowLessMessages}>
+                    Show Less messages
+                  </button>
+                </>
+              )
+              }
             </>
           )}
         </>
