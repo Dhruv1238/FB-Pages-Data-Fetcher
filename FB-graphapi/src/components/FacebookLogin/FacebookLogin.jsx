@@ -15,6 +15,8 @@ function FacebookLoginButton() {
   const [loading, setLoading] = useState(false);
   const [commentBatchSize, setCommentBatchSize] = useState(5);
   const [commentIndex, setCommentIndex] = useState(commentBatchSize);
+  const [selectedPost, setSelectedPost] = useState(null);
+
 
   const handleFacebookLogin = () => {
     setLoading(true);
@@ -169,9 +171,19 @@ function FacebookLoginButton() {
     }));
   };
 
+
   const handleLoadMoreComments = (postId, accessToken) => {
     setCommentIndex((prevIndex) => prevIndex + commentBatchSize);
-    fetchComments([{ id: postId, accessToken }]);
+  };
+
+  const handlePostSelect = (postId) => {
+    const post = posts.find((post) => post.id === postId);
+    setSelectedPost(post);
+  };
+
+  const handleLoadMorePosts = () => {
+    setCommentIndex(commentBatchSize);
+    setSelectedPost(null);
   };
 
   useEffect(() => {
@@ -179,72 +191,71 @@ function FacebookLoginButton() {
       window.FB.XFBML.parse();
     }
   }, []);
-
   return (
     <div className="container">
       {loading && <Loader />}
       <button className="login-button" onClick={handleFacebookLogin}>
         Login with Facebook
       </button>
-      <ul className="page-list">
-        {pageAccessTokens.map((page) => (
-          <li key={page.id} className="page-item">
-            <h1 className="page-name">Page Name: {page.name}</h1>
-            <ul className="post-list">
-              {posts
-                .filter((post) => post.accessToken === page.accessToken)
-                .map((post) => (
-                  <li key={post.id} className="post-item">
-                    <div className="post-content">
-                      <div className="post-name">Post Subject: {post.name}</div>
-                      <ul className="comment-list">
-                        Comments: <br />
-                        {post.comments.slice(0, commentIndex).map((comment) => (
-                          <li key={comment.id} className="comment-item">
-                            <div className='comment'>
-                              {comment.name} Commented: <br/>
-                              {comment.message}
-                            </div>
-                            <div className="reply-section">
-                              <input
-                                type="text"
-                                className="reply-input"
-                                placeholder="Reply"
-                                value={replyInputs[comment.id] || ''}
-                                onChange={(event) => handleInputChange(comment.id, event)}
-                              />
-                              <button
-                                className="reply-button"
-                                onClick={() => handleReply(post.id, comment.id, post.accessToken)}
-                              >
-                                Reply
-                              </button>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                      {post.comments.length > commentIndex && (
-                        <button
-                          className="next-button"
-                          onClick={() => handleLoadMoreComments(post.id, post.accessToken)}
-                        >
-                          Load Next Comments
-                        </button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
+      {
+        posts.length > 0 && (
+          <>
+            <select className="post-dropdown" onChange={(e) => handlePostSelect(e.target.value)}>
+              <option value="">Select a Post</option>
+              {posts.slice(0, commentIndex).map((post) => (
+                <option key={post.id} value={post.id}>
+                  {post.name}
+                </option>
+              ))}
+            </select>
+            <button className="load-more-button" onClick={handleLoadMorePosts}>
+              Load More Posts
+            </button>
+          </>
+        )
+      }
+
+
+      {selectedPost && (
+        <div className="selected-post">
+          <h1 className="post-name">Selected Post: {selectedPost.name}</h1>
+          <ul className="comment-list">
+            {selectedPost.comments.slice(0, commentIndex).map((comment) => (
+              <li key={comment.id} className="comment-item">
+                <div className="comment">
+                  {comment.name} Commented: <br />
+                  {comment.message}
+                </div>
+                <div className="reply-section">
+                  <input
+                    type="text"
+                    className="reply-input"
+                    placeholder="Write a reply..."
+                    value={replyInputs[comment.id] || ''}
+                    onChange={(e) => handleInputChange(comment.id, e)}
+                  />
+                  <button
+                    className="reply-button"
+                    onClick={() => handleReply(selectedPost.id, comment.id, selectedPost.accessToken)}
+                  >
+                    Reply
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {selectedPost.comments.length > commentIndex && (
+            <button className="load-more-comments-button" onClick={handleLoadMoreComments}>
+              Load More Comments
+            </button>
+          )}
+        </div>
+      )}
       {pageIds.map((pageId, index) => (
         <PageConversations key={pageId} pageId={pageId} accessToken={accessTokens[index]} />
       ))}
-      <ToastContainer />
     </div>
-  );
-
+  )
 }
 
 export default FacebookLoginButton;

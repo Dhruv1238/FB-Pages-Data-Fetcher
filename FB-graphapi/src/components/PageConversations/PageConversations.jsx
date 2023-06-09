@@ -10,7 +10,8 @@ const PageConversations = ({ pageId, accessToken }) => {
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showAll, setShowAll] = useState(false)
+  const batchSize = 5;
+  const [showMessages, setShowMessages] = useState(batchSize)
 
   useEffect(() => {
     const getPageConversations = () => {
@@ -108,6 +109,13 @@ const PageConversations = ({ pageId, accessToken }) => {
     }
   };
 
+  const handleShowMoreMessages = () => {
+    setShowMessages((prev) => prev + batchSize)
+  }
+  const handleShowLessMessages = () => {
+    setShowMessages((prev) => prev - batchSize)
+  }
+
   const handleConversationSelect = conversationId => {
     const selectedConv = conversations.find(conv => conv.id === conversationId);
     setSelectedConversation(selectedConv);
@@ -141,7 +149,7 @@ const PageConversations = ({ pageId, accessToken }) => {
         <>
           <h1 className="conversation-heading">Your Conversation with: {selectedConversation.messages[selectedConversation.messages.length - 1].from}</h1>
           <ul className="message-list">
-            {!showAll ? (selectedConversation.messages.slice(0, 5).map((message, index) => (
+            {selectedConversation.messages.length > 5 ? (selectedConversation.messages.slice(0, showMessages).map((message, index) => (
               <li key={index} className="message-item">
                 <h3 className="conversation-participant">From: {selectedConversation.messages[index].from}</h3>
                 {message.message}
@@ -169,20 +177,17 @@ const PageConversations = ({ pageId, accessToken }) => {
           </div>
           {checkLength(selectedConversation) && (
             <>
-              <button className='reply-button' style={{
-                margin:'20px'
-              }} onClick={() => setShowAll(!showAll)}>
-                {!showAll ? (
+                {selectedConversation.messages.length > 5 ? (
                   <>
-                    Show More messages
+                    <button className='reply-button' onClick={handleShowMoreMessages}>
+                      Show More messages
+                    </button>
+                    <button className='reply-button' onClick={handleShowLessMessages}>
+                      Show Less messages
+                    </button>
                   </>
-                ) : (
-                  <>
-                    Show Less Messages
-                  </>
-                )}
 
-              </button>
+                ) : null}
             </>
           )}
         </>
