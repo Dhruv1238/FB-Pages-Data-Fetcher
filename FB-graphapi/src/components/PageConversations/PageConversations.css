@@ -80,3 +80,16 @@
 .message-item-recipient {
   text-align: left;
 }
+
+.next-button {
+  display: block;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #3b5998;
+  color: #fff;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
