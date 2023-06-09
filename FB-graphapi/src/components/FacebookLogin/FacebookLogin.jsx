@@ -16,7 +16,8 @@ function FacebookLoginButton() {
   const [commentBatchSize, setCommentBatchSize] = useState(5);
   const [commentIndex, setCommentIndex] = useState(commentBatchSize);
   const [selectedPost, setSelectedPost] = useState(null);
-
+  const [selectedPage, setSelectedPage] = useState('');
+  const [selectedPageId, setSelectedPageId] = useState('');
 
   const handleFacebookLogin = () => {
     setLoading(true);
@@ -39,6 +40,33 @@ function FacebookLoginButton() {
     );
   };
 
+  // const fetchPageAccessTokens = (userAccessToken, userID) => {
+  //   window.FB.api(`/${userID}/accounts`, 'GET', { access_token: userAccessToken }, (response) => {
+  //     if (response.data && response.data.length > 0) {
+  //       const pageAccessTokens = response.data.map((page) => ({
+  //         id: page.id,
+  //         name: page.name,
+  //         accessToken: page.access_token,
+  //       }));
+  //       console.log('Page access tokens:', pageAccessTokens);
+  //       setPageAccessTokens(pageAccessTokens);
+  //       const ids = pageAccessTokens.map((page) => page.id);
+  //       const tokens = pageAccessTokens.map((page) => page.accessToken);
+  //       setPageIds(ids);
+  //       setAccessTokens(tokens);
+  //       fetchPostsAndComments(pageAccessTokens);
+  //     } else {
+  //       console.log('No pages found for the user.');
+  //     }
+  //   });
+  // };
+  const handlePageSelect = (pageId) => {
+    setSelectedPageId(pageId);
+    const selectedPage = pageAccessTokens.find((page) => page.id === pageId);
+    setSelectedPage(selectedPage.accessToken);
+    setSelectedPost(null);
+  };
+
   const fetchPageAccessTokens = (userAccessToken, userID) => {
     window.FB.api(`/${userID}/accounts`, 'GET', { access_token: userAccessToken }, (response) => {
       if (response.data && response.data.length > 0) {
@@ -53,12 +81,15 @@ function FacebookLoginButton() {
         const tokens = pageAccessTokens.map((page) => page.accessToken);
         setPageIds(ids);
         setAccessTokens(tokens);
+        setSelectedPage(ids[0]);
+        setSelectedPageId(ids[0]);
         fetchPostsAndComments(pageAccessTokens);
       } else {
-        console.log('No pages found for the user.');
+        toast.error('No pages found for the user.');
       }
     });
   };
+
 
   const fetchPostsAndComments = (pageAccessTokens) => {
     pageAccessTokens.forEach((page) => {
@@ -73,7 +104,6 @@ function FacebookLoginButton() {
           console.log('Posts:', posts);
           setPosts((prevPosts) => [...prevPosts, ...posts]);
           fetchComments(posts);
-          toast.success('Posts fetched!!');
         } else {
           toast.error('No posts found for the page.');
         }
@@ -108,7 +138,6 @@ function FacebookLoginButton() {
                 return prevPost;
               });
             });
-            toast.success('Comments fetched!!');
           } else {
             console.log('No comments found for the post.');
           }
@@ -138,7 +167,7 @@ function FacebookLoginButton() {
         }
       });
     } else {
-      console.log('Reply message is empty.');
+      toast.error('Reply message is empty.');
     }
   };
 
@@ -177,7 +206,7 @@ function FacebookLoginButton() {
   };
 
   const handlePostSelect = (postId) => {
-    const post = posts.find((post) => post.id === postId);
+    const post = posts.find((post) => post.id === postId && post.accessToken === selectedPage);
     setSelectedPost(post);
   };
 
@@ -193,23 +222,36 @@ function FacebookLoginButton() {
         <button className="login-button" onClick={handleFacebookLogin}>
           Login with Facebook
         </button>
+        {pageAccessTokens.length > 0 && (
+          <div className='page-dropdown'>
+            <h3 className='page-heading'>Select Page: </h3>
+            <select className="page-select" value={selectedPageId} onChange={(e) => handlePageSelect(e.target.value)}>
+              {pageAccessTokens.map((page) => (
+                <option key={page.id} value={page.id}>
+                  {page.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         {
           posts.length > 0 && (
             <div className='post-dropdown'>
               <h3 className='post-heading'>Select Post: </h3>
               <select className="post-select" onChange={(e) => handlePostSelect(e.target.value)}>
                 <option value="">Select a Post</option>
-                {posts.slice(0, commentIndex).map((post) => (
-                  <option key={post.id} value={post.id}>
-                    {post.name}
-                  </option>
-                ))}
+                {posts
+                  .filter((post) => post.accessToken === selectedPage)
+                  .slice(0, commentIndex)
+                  .map((post) => (
+                    <option key={post.id} value={post.id}>
+                      {post.name}
+                    </option>
+                  ))}
               </select>
             </div>
           )
         }
-
-
         {selectedPost && (
           <div className="selected-post">
             <h1 className="post-name">Selected Post: {selectedPost.name}</h1>
@@ -246,7 +288,7 @@ function FacebookLoginButton() {
           </div>
         )}
         {pageIds.map((pageId, index) => (
-          <PageConversations key={pageId} pageId={pageId} accessToken={accessTokens[index]} />
+          <PageConversations key={pageId} pageId={selectedPageId} accessToken={accessTokens[index]} />
         ))}
       </div>
     </>
